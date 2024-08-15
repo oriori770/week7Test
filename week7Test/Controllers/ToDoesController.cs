@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.IdentityModel.Tokens.Jwt;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
 using Azure;
 using Microsoft.AspNetCore.Mvc;
@@ -44,6 +45,14 @@ namespace week7Test.Controllers
             return listTodo;
         }
         
+        [HttpPost]
+        public async Task<ToDo> Create(ToDo toDo)
+        {
+            var response = await client.PostAsJsonAsync("'https://dummyjson.com/todos/add'", toDo);
+            response.EnsureSuccessStatusCode();
+            var createdTodo = await response.Content.ReadFromJsonAsync<ToDo>();
+            return createdTodo;
+        }
 
         // GET: ToDoes/Details/5
         public async Task<IActionResult> Details(int? id)
@@ -72,18 +81,6 @@ namespace week7Test.Controllers
         // POST: ToDoes/Create
         // To protect from overposting attacks, enable the specific properties you want to bind to.
         // For more details, see http://go.microsoft.com/fwlink/?LinkId=317598.
-        [HttpPost]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create([Bind("Id,Todo,Completed,UserId")] ToDo toDo)
-        {
-            if (ModelState.IsValid)
-            {
-                _context.Add(toDo);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
-            }
-            return View(toDo);
-        }
 
         // GET: ToDoes/Edit/5
         public async Task<IActionResult> Edit(int? id)
